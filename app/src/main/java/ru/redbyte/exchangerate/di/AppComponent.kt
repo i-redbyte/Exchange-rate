@@ -13,6 +13,7 @@ import javax.inject.Singleton
             AppModule::class,
             AndroidSupportInjectionModule::class,
             ScreenBindingModule::class,
+            LocalDataModule::class,
             NetworkModule::class
         ]
 )
