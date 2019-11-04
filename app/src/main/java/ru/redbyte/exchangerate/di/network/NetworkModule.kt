@@ -19,17 +19,17 @@ internal class NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-            networkSettings: NetworkSettings
+        networkSettings: NetworkSettings
     ): OkHttpClient {
         val logInterceptor = if (networkSettings.logRequests)
             HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
         else
             null
         return OkHttpClient.Builder()
-                .apply { logInterceptor?.let { addNetworkInterceptor(it) } }
-                .connectTimeout(networkSettings.connectionTimeout, TimeUnit.SECONDS)
-                .readTimeout(networkSettings.readTimeout, TimeUnit.SECONDS)
-                .build()
+            .apply { logInterceptor?.let { addNetworkInterceptor(it) } }
+            .connectTimeout(networkSettings.connectionTimeout, TimeUnit.SECONDS)
+            .readTimeout(networkSettings.readTimeout, TimeUnit.SECONDS)
+            .build()
     }
 
     @Singleton
@@ -39,16 +39,16 @@ internal class NetworkModule {
     @Singleton
     @Provides
     fun provideRetrofit(
-            networkSettings: NetworkSettings,
-            okHttpClient: OkHttpClient,
-            gson: Gson
+        networkSettings: NetworkSettings,
+        okHttpClient: OkHttpClient,
+        gson: Gson
     ): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(networkSettings.baseUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
+            .baseUrl(networkSettings.baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
     }
 
     @Singleton
@@ -58,6 +58,5 @@ internal class NetworkModule {
     @Provides
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): ExchangeApi = retrofit.create(ExchangeApi::class.java)
-
 
 }

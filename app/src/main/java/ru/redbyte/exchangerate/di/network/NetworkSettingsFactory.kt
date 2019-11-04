@@ -8,8 +8,8 @@ object NetworkSettingsFactory {
         @Suppress("ConstantConditionIf")
         override val baseUrl: String = "https://api.exchangeratesapi.io/"
 
-        override val readTimeout: Long = 30
-        override val connectionTimeout: Long = 30
+        override val readTimeout: Long = 5
+        override val connectionTimeout: Long = 5
 
         override val logRequests: Boolean = BuildConfig.DEBUG
     }

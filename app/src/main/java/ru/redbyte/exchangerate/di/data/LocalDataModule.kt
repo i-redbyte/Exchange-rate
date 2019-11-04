@@ -1,4 +1,4 @@
-package ru.redbyte.exchangerate.di
+package ru.redbyte.exchangerate.di.data
 
 import android.content.Context
 import android.content.SharedPreferences
