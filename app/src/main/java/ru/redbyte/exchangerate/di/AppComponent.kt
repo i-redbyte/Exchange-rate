@@ -4,6 +4,7 @@ import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import ru.redbyte.exchangerate.App
+import ru.redbyte.exchangerate.di.network.NetworkModule
 import javax.inject.Singleton
 
 @Singleton
@@ -11,7 +12,8 @@ import javax.inject.Singleton
         modules = [
             AppModule::class,
             AndroidSupportInjectionModule::class,
-            ScreenBindingModule::class
+            ScreenBindingModule::class,
+            NetworkModule::class
         ]
 )
 interface AppComponent : AndroidInjector<App> {
