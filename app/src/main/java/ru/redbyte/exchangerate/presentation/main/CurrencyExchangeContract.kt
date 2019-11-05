@@ -13,6 +13,6 @@ interface CurrencyExchangeContract {
     }
 
     interface Presenter : BaseContract.Presenter {
-
+        fun saveBalance(balance: Map<Currency, Double>)
     }
 }
