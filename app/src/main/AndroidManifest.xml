@@ -18,7 +18,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         >
-        <activity android:name=".presentation.main.MainActivity">
+        <activity android:name=".presentation.main.CurrencyExchangeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -5,7 +5,8 @@ import android.widget.Toast
 import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
 
-class MainActivity : BaseActivity<MainContract.Presenter>(), MainContract.View {
+class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter>(),
+        CurrencyExchangeContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,5 +17,4 @@ class MainActivity : BaseActivity<MainContract.Presenter>(), MainContract.View {
     override fun showError(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
-
 }
