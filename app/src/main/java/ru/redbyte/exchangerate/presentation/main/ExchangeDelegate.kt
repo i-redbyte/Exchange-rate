@@ -33,6 +33,9 @@ class ExchangeDelegate(
         val view = inflater.inflate(R.layout.item_exchange, parent, false)
 
         return Holder(view, selectExchangeRate).apply {
+            etAmount.setOnFocusChangeListener { view, hasFocus ->
+                if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
+            }
             etAmount.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable) = Unit
 
@@ -63,7 +66,7 @@ class ExchangeDelegate(
         @SuppressLint("SetTextI18n")
         fun bind(item: ExchangeRateView) {
             val symbol = getCurrencySymbol(item.base, itemView.context)
-            val symbolTarget = getCurrencySymbol(selectExchangeRate?.base?:"", itemView.context)
+            val symbolTarget = getCurrencySymbol(selectExchangeRate?.base ?: "", itemView.context)
 
             tvBase.text = item.base
             tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.base, selectExchangeRate)}"

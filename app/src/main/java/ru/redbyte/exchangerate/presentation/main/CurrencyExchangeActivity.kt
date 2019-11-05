@@ -9,6 +9,7 @@ import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
 import ru.redbyte.exchangerate.base.DelegationAdapter
 import ru.redbyte.exchangerate.base.extension.setActionBar
+import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 
 class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter>(),
@@ -29,7 +30,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private fun setupView() {
         setupActionBar()
         setupRecyclerView()
-        btnExchange.setOnClickListener { }
+        btnExchange.setOnClickListener {
+            rvSource.clearFocus()
+            rvReceiver.clearFocus()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -64,6 +68,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     override fun showBaseExchangeRate(list: List<ExchangeRateView>) {
         adapterSource.items = list
         adapterReceiver.items = list
+    }
+
+    override fun showBalance(balance: Map<Currency, Double>) {
+
     }
 
     override fun showError(message: String?) {
