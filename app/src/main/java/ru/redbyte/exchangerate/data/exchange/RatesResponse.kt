@@ -1,4 +1,4 @@
-package ru.redbyte.exchangerate.data
+package ru.redbyte.exchangerate.data.exchange
 
 import com.google.gson.annotations.SerializedName
 import ru.redbyte.exchangerate.domain.Rates
