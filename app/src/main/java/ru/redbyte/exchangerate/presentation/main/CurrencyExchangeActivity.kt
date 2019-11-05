@@ -3,6 +3,7 @@ package ru.redbyte.exchangerate.presentation.main
 import android.os.Bundle
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import kotlinx.android.synthetic.main.activity_currency_exchange.*
 import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
@@ -33,6 +34,9 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
     private fun setupRecyclerView() {
         //************Source RV************
+        val pshSource = PagerSnapHelper()
+        pshSource.attachToRecyclerView(rvSource)
+
         adapterSource = DelegationAdapter()
         adapterReceiver = DelegationAdapter()
         rvSource.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -44,6 +48,9 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         adapterSource.delegatesManager.addDelegate(sourceDelegate)
         rvSource.adapter = adapterSource
         //************Receiver RV************
+        val pshReceiver = PagerSnapHelper()
+        pshReceiver.attachToRecyclerView(rvReceiver)
+
         rvReceiver.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         receiverDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String) {
