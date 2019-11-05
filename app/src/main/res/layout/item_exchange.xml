@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="240dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:elevation="8dp"
+        >
+
+        <TextView
+            android:id="@+id/tvBase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/card_text_size_top"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="EUR"
+            />
+
+        <TextView
+            android:id="@+id/tvYouHave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/currency_exchange_you_have"
+            android:textColor="@color/black"
+            android:textSize="@dimen/card_text_size_bottom"
+            app:layout_constraintStart_toStartOf="@+id/tvBase"
+            app:layout_constraintTop_toBottomOf="@+id/tvBase"
+            />
+
+        <EditText
+            android:id="@+id/etAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:inputType="numberDecimal"
+            android:minWidth="120dp"
+            android:text="@string/zero"
+            android:textSize="@dimen/card_text_size_top"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tvRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/currency_exchange_rate"
+            android:textColor="@color/black"
+            android:textSize="@dimen/card_text_size_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/etAmount"
+            app:layout_constraintTop_toBottomOf="@+id/etAmount"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

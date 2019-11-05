@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Exchange rate</string>
     <string name="currency_exchange_exchange">Exchange</string>
+    <string name="currency_exchange_you_have">You have: %1$s</string>
+    <string name="currency_exchange_rate">%1$s = %2$s</string>
     <string name="usd">$</string>
     <string name="eur">€</string>
     <string name="gbp">£</string>
+    <string name="zero">0</string>
 </resources>
