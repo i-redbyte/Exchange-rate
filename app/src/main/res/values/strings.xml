@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Exchange rate</string>
+    <string name="currency_exchange_exchange">Exchange</string>
+    <string name="usd">$</string>
+    <string name="eur">€</string>
+    <string name="gbp">£</string>
 </resources>
