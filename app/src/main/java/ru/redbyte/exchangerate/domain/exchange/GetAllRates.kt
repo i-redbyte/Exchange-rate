@@ -8,15 +8,15 @@ import ru.redbyte.exchangerate.domain.UseCase.None
 import javax.inject.Inject
 
 class GetAllRates @Inject constructor(
-        private val resultDataSource: ExchangeDataSource
+    private val resultDataSource: ExchangeDataSource
 ) : SingleUseCase<List<ExchangeRate>, None>() {
 
     override fun execute(params: None): Single<List<ExchangeRate>> {
-        val usd = resultDataSource.getRate(USD, "$EUR,$GBP")
-        val eur = resultDataSource.getRate(EUR, "$USD,$GBP")
-        val gbp = resultDataSource.getRate(GBP, "$USD,$EUR")
+        val usd = resultDataSource.getRate(USD, "$USD,$EUR,$GBP")
+        val eur = resultDataSource.getRate(EUR, "$USD,$GBP") //SERVER BUG for base = EUR, if symbols =$USD,$EUR,$GBP then return  "error": "Symbols 'EUR,USD,GBP' are invalid for date 2019-11-05."
+        val gbp = resultDataSource.getRate(GBP, "$USD,$EUR,$GBP")
         return Single
-                .merge(usd, eur, gbp)
-                .toList()
+            .merge(usd, eur, gbp)
+            .toList()
     }
 }

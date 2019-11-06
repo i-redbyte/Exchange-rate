@@ -7,7 +7,7 @@ import ru.redbyte.exchangerate.data.exchange.ExchangeRateResponse
 import ru.redbyte.exchangerate.data.exchange.Currency
 
 interface ExchangeApi {
-    @GET("latest/") //example: base_url/latest?base=USD&symbols=EUR,GBP
+    @GET("latest") //example: base_url/latest?base=USD&symbols=EUR,GBP
     fun getExchangeRate(
         @Query("base") base: Currency,
         @Query("symbols") symbols: String
