@@ -1,5 +1,6 @@
 package ru.redbyte.exchangerate.presentation.main
 
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.redbyte.exchangerate.base.BasePresenter
@@ -10,6 +11,7 @@ import ru.redbyte.exchangerate.domain.balance.Param
 import ru.redbyte.exchangerate.domain.balance.SaveBalance
 import ru.redbyte.exchangerate.domain.exchange.GetAllRates
 import ru.redbyte.exchangerate.presentation.model.asView
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CurrencyExchangePresenter @Inject constructor(
@@ -21,8 +23,8 @@ class CurrencyExchangePresenter @Inject constructor(
 
     override fun start() {
         getBalance()
-        disposables += /*Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
-            .flatMap { */getAllRates.execute(None).toObservable() //}
+        disposables += Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
+            .flatMap { getAllRates.execute(None).toObservable() }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map { it.map { exchangeRate -> exchangeRate.asView() } }
@@ -45,6 +47,6 @@ class CurrencyExchangePresenter @Inject constructor(
     }
 
     companion object {
-        private const val REQUEST_PERIOD = 5L
+        private const val REQUEST_PERIOD = 30L
     }
 }

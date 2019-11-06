@@ -1,7 +1,6 @@
 package ru.redbyte.exchangerate.presentation.main
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -10,14 +9,15 @@ import kotlinx.android.synthetic.main.activity_currency_exchange.*
 import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
 import ru.redbyte.exchangerate.base.DelegationAdapter
+import ru.redbyte.exchangerate.base.DelegationAdapter.Payload
 import ru.redbyte.exchangerate.base.extension.attachSnapHelperWithListener
 import ru.redbyte.exchangerate.base.extension.setActionBar
 import ru.redbyte.exchangerate.data.exchange.Currency
-import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL
+import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 
 class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter>(),
-    CurrencyExchangeContract.View {
+        CurrencyExchangeContract.View {
 
     private lateinit var adapterSource: DelegationAdapter
     private lateinit var adapterReceiver: DelegationAdapter
@@ -40,6 +40,28 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         }
     }
 
+    override fun showBaseExchangeRate(list: List<ExchangeRateView>) {
+        val sList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
+        val rList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
+
+        if (sList.isNullOrEmpty().not() && rList.isNullOrEmpty().not()){
+            for ((index,value) in list.withIndex()){
+                val sTmp = sList[index].selectExchangeRate
+                val rTmp = rList[index].selectExchangeRate
+                sList[index] = value
+                sList[index].selectExchangeRate = sTmp
+                rList[index] = value
+                rList[index].selectExchangeRate = rTmp
+                adapterSource.items = sList
+                adapterReceiver.items = rList
+            }
+        }else {
+            list.first().selectExchangeRate = list.first()
+            adapterSource.items = list
+            adapterReceiver.items = list
+        }
+    }
+
     private fun setupRecyclerView() {
         receiverDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String) {
@@ -55,15 +77,19 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         adapterSource = DelegationAdapter()
         adapterReceiver = DelegationAdapter()
         //************Source RV************
-        val pshSource = PagerSnapHelper()
-        rvSource.attachSnapHelperWithListener(pshSource, NOTIFY_ON_SCROLL, object : OnChangeSnapPositionListener {
+
+        rvSource.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
                 val item = adapterSource.items[position] as ExchangeRateView
                 val list = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
+                val mainList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
                 val targetItem = list[getCurrentPosition(rvReceiver)]
+                mainList[position].selectExchangeRate = targetItem
+
                 targetItem.selectExchangeRate = item
                 list[getCurrentPosition(rvReceiver)] = targetItem
-                adapterReceiver.setItems(list, DelegationAdapter.Payload.UPDATE)
+                adapterReceiver.setItems(list, Payload.UPDATE)
+                adapterSource.setItems(mainList, Payload.UPDATE)
             }
         })
         rvSource.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -72,15 +98,19 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         //************Receiver RV************
 
-        val pshReceiver = PagerSnapHelper()
-        rvReceiver.attachSnapHelperWithListener(pshReceiver, NOTIFY_ON_SCROLL, object : OnChangeSnapPositionListener {
+        rvReceiver.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
                 val item = adapterReceiver.items[position] as ExchangeRateView
                 val list = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
+                val mainList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
                 val targetItem = list[getCurrentPosition(rvSource)]
+                mainList[position].selectExchangeRate = targetItem
+
                 targetItem.selectExchangeRate = item
                 list[getCurrentPosition(rvSource)] = targetItem
-                adapterSource.setItems(list, DelegationAdapter.Payload.UPDATE)
+                adapterSource.setItems(list, Payload.UPDATE)
+                adapterReceiver.setItems(mainList, Payload.UPDATE)
+
             }
         })
 
@@ -88,41 +118,9 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         adapterReceiver.delegatesManager.addDelegate(receiverDelegate)
         rvReceiver.adapter = adapterReceiver
     }
-    @Deprecated("remove after tests")
-    private fun addScrollListenerLogic(
-        rv: RecyclerView,
-        adapter: DelegationAdapter,
-        delegate: ExchangeDelegate
-    ) {
-        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val position = getCurrentPosition(recyclerView)
-                    val item = adapter.items[position] as ExchangeRateView
-                    //delegate.selectExchangeRate = item
-                    Log.d("_debug", "sourcPos =${getCurrentPosition(rvSource)}")
-                    Log.d("_debug", "recPos =${getCurrentPosition(rvReceiver)}")
-                    adapterReceiver.notifyItemChanged(getCurrentPosition(rvReceiver))
-                    adapterSource.notifyItemChanged(getCurrentPosition(rvSource))
-                    // TODO: Red_byte 2019-11-06 release it
-                    Log.d("_debug", "BASE: ${item.base}")
-                    Log.d("_debug", "USD: ${item.rates.usd}")
-                    Log.d("_debug", "EUR: ${item.rates.eur}")
-                    Log.d("_debug", "GBP: ${item.rates.gbp}")
-                    Log.d("_debug", "position: $position")
-                }
-            }
-        })
-    }
 
     private fun getCurrentPosition(rv: RecyclerView): Int =
-        (rv.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-
-    override fun showBaseExchangeRate(list: List<ExchangeRateView>) {
-        adapterSource.items = list
-        adapterReceiver.items = list
-    }
+            (rv.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
     override fun showBalance(balance: Map<Currency, Double>) {
         sourceDelegate.balance = balance
