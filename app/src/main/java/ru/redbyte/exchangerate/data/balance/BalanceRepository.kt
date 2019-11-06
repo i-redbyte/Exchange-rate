@@ -14,14 +14,15 @@ import java.lang.reflect.Type
 import javax.inject.Inject
 
 class BalanceRepository @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
-    private val gson: Gson
+        private val sharedPreferences: SharedPreferences,
+        private val gson: Gson
 ) : BalanceDataSource {
     private val balanceTypeToken: Type by lazy { typeTokenOf<HashMap<Currency, Double>>() }
 
     override fun getBalance(): Single<Map<Currency, Double>> = Single.fromCallable {
         val balance = sharedPreferences.getString(BALANCE, "") ?: ""
-        return@fromCallable gson.fromJson(balance, balanceTypeToken) ?: mapOf(USD to 100.0, EUR to 100.0, GBP to 100.0)
+        return@fromCallable gson.fromJson(balance, balanceTypeToken)
+                ?: mapOf(USD to 100.0, EUR to 100.0, GBP to 100.0, RUB to 100.0)
     }
 
     override fun saveBalance(balance: Map<Currency, Double>): Completable = Completable.fromAction {

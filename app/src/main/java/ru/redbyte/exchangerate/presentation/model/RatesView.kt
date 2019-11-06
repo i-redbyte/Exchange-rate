@@ -8,11 +8,13 @@ import ru.redbyte.exchangerate.domain.Rates
 class RatesView(
         val eur: Double,
         val gbp: Double,
-        val usd: Double
+        val usd: Double,
+        val rub: Double
 ) : Parcelable
 
 fun Rates.asView() = RatesView(
         eur = eur,
         gbp = gbp,
-        usd = usd
+        usd = usd,
+        rub = rub
 )

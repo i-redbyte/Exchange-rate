@@ -6,5 +6,6 @@
     <string name="usd">$</string>
     <string name="eur">€</string>
     <string name="gbp">£</string>
+    <string name="rub">₽</string>
     <string name="zero">0</string>
 </resources>

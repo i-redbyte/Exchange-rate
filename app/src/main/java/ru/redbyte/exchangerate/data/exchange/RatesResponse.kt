@@ -9,11 +9,14 @@ class RatesResponse(
         @SerializedName("GBP")
         val gbp: Double,
         @SerializedName("USD")
-        val usd: Double
+        val usd: Double,
+        @SerializedName("RUB")
+        val rub: Double
 )
 
 fun RatesResponse.toRates() = Rates(
         eur = eur,
         gbp = gbp,
-        usd = usd
+        usd = usd,
+        rub = rub
 )

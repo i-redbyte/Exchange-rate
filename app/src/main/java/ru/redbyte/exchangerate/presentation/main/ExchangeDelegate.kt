@@ -20,49 +20,45 @@ import ru.redbyte.exchangerate.data.exchange.Currency.*
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 
 class ExchangeDelegate(
-    context: Context,
-    private val listener: ExchangeListener
+        context: Context,
+        private val listener: ExchangeListener
 ) : AbsListItemAdapterDelegate<ExchangeRateView, Any, ExchangeDelegate.Holder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-
-//    var selectExchangeRate: ExchangeRateView? = null
-
 
     var balance: Map<Currency, Double> = mapOf()
 
     override fun isForViewType(item: Any, items: List<Any>, position: Int): Boolean =
-        item is ExchangeRateView
+            item is ExchangeRateView
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateViewHolder(parent: ViewGroup): Holder {
         val view = inflater.inflate(R.layout.item_exchange, parent, false)
 
-        return Holder(view, /*selectExchangeRate,*/ balance)
-            .apply {
-                etAmount.setOnFocusChangeListener { view, hasFocus ->
-                    if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
-                }
-                etAmount.addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(s: Editable) = Unit
-
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
-
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        if (s.isNotEmpty()) {
-                            listener.onChangeAmount(s.toString())
-                        }
+        return Holder(view, balance)
+                .apply {
+                    etAmount.setOnFocusChangeListener { view, hasFocus ->
+                        if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
                     }
-                })
-            }
+                    etAmount.addTextChangedListener(object : TextWatcher {
+                        override fun afterTextChanged(s: Editable) = Unit
+
+                        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
+
+                        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                            if (s.isNotEmpty()) {
+                                listener.onChangeAmount(s.toString())
+                            }
+                        }
+                    })
+                }
     }
 
     override fun onBindViewHolder(item: ExchangeRateView, holder: Holder, payloads: List<Any>) =
-        holder.bind(item)
+            holder.bind(item)
 
     class Holder(
-        itemView: View,
-//        private val selectExchangeRate: ExchangeRateView?,
-        private val balance: Map<Currency, Double>
+            itemView: View,
+            private val balance: Map<Currency, Double>
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val tvBase: TextView = requireViewById(itemView, R.id.tvBase)
@@ -72,7 +68,6 @@ class ExchangeDelegate(
 
         @SuppressLint("SetTextI18n")
         fun bind(item: ExchangeRateView) {
-            Log.d("_debug","SELECT_BASE = ${item.selectExchangeRate?.base}")
             val symbol = getCurrencySymbol(item.base, itemView.context)
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
 
@@ -83,20 +78,26 @@ class ExchangeDelegate(
         }
 
         private fun getCurrencySymbol(base: String, context: Context): String =
-            when (base) {
-                USD.name -> context.getString(R.string.usd)
-                GBP.name -> context.getString(R.string.gbp)
-                EUR.name -> context.getString(R.string.eur)
-                else -> ""
-            }
+                when (base) {
+                    USD.name -> context.getString(R.string.usd)
+                    GBP.name -> context.getString(R.string.gbp)
+                    EUR.name -> context.getString(R.string.eur)
+                    RUB.name -> context.getString(R.string.rub)
+                    else -> ""
+                }
 
         private fun getRate(base: String, exchangeRate: ExchangeRateView?): String =
-            when (base) {
-                USD.name -> exchangeRate?.rates?.usd?.format(2) ?: ""
-                GBP.name -> exchangeRate?.rates?.gbp?.format(2) ?: ""
-                EUR.name -> exchangeRate?.rates?.eur?.format(2) ?: ""
-                else -> ""
-            }
+                when (base) {
+                    USD.name -> exchangeRate?.rates?.usd?.format(DECIMAL_PLACES) ?: ""
+                    GBP.name -> exchangeRate?.rates?.gbp?.format(DECIMAL_PLACES) ?: ""
+                    EUR.name -> exchangeRate?.rates?.eur?.format(DECIMAL_PLACES) ?: ""
+                    RUB.name -> exchangeRate?.rates?.rub?.format(DECIMAL_PLACES) ?: ""
+                    else -> ""
+                }
+
+        companion object {
+            private const val DECIMAL_PLACES = 3
+        }
     }
 }
 

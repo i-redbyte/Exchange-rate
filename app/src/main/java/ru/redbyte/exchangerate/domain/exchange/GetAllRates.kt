@@ -12,11 +12,12 @@ class GetAllRates @Inject constructor(
 ) : SingleUseCase<List<ExchangeRate>, None>() {
 
     override fun execute(params: None): Single<List<ExchangeRate>> {
-        val usd = resultDataSource.getRate(USD, "$USD,$EUR,$GBP")
-        val eur = resultDataSource.getRate(EUR, "$USD,$GBP") //SERVER BUG for base = EUR, if symbols =$USD,$EUR,$GBP then return  "error": "Symbols 'EUR,USD,GBP' are invalid for date 2019-11-05."
-        val gbp = resultDataSource.getRate(GBP, "$USD,$EUR,$GBP")
+        val rub = resultDataSource.getRate(RUB, "$USD,$EUR,$GBP,$RUB")
+        val usd = resultDataSource.getRate(USD, "$USD,$EUR,$GBP,$RUB")
+        val eur = resultDataSource.getRate(EUR, "$USD,$GBP,$RUB") //SERVER BUG for base = EUR, if symbols =$USD,$EUR,$GBP then return  "error": "Symbols 'EUR,USD,GBP' are invalid for date 2019-11-05."
+        val gbp = resultDataSource.getRate(GBP, "$USD,$EUR,$GBP,$RUB")
         return Single
-            .merge(usd, eur, gbp)
+            .merge(usd, eur, gbp, rub)
             .toList()
     }
 }
