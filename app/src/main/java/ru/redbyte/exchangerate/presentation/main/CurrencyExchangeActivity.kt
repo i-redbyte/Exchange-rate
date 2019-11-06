@@ -1,6 +1,7 @@
 package ru.redbyte.exchangerate.presentation.main
 
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -11,6 +12,7 @@ import ru.redbyte.exchangerate.base.BaseActivity
 import ru.redbyte.exchangerate.base.DelegationAdapter
 import ru.redbyte.exchangerate.base.DelegationAdapter.Payload
 import ru.redbyte.exchangerate.base.extension.attachSnapHelperWithListener
+import ru.redbyte.exchangerate.base.extension.format
 import ru.redbyte.exchangerate.base.extension.setActionBar
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
@@ -44,8 +46,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         val sList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
         val rList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
 
-        if (sList.isNullOrEmpty().not() && rList.isNullOrEmpty().not()){
-            for ((index,value) in list.withIndex()){
+        if (sList.isNullOrEmpty().not() && rList.isNullOrEmpty().not()) {
+            for ((index, value) in list.withIndex()) {
                 val sTmp = sList[index].selectExchangeRate
                 val rTmp = rList[index].selectExchangeRate
                 sList[index] = value
@@ -55,7 +57,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 adapterSource.items = sList
                 adapterReceiver.items = rList
             }
-        }else {
+        } else {
             list.first().selectExchangeRate = list.first()
             adapterSource.items = list
             adapterReceiver.items = list
@@ -64,14 +66,28 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
     private fun setupRecyclerView() {
         receiverDelegate = ExchangeDelegate(this, object : ExchangeListener {
-            override fun onChangeAmount(amount: String) {
-                // TODO: Red_byte 2019-11-06 release it
+            override fun onChangeAmount(amount: String, position: Int) {
+                // TODO: Red_byte 2019-11-06 extract to method
+                val item = adapterReceiver.items[position] as ExchangeRateView
+                val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
+                val etCurrent = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
+                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val result = amount.toDouble() * rate
+                if (currentFocus == etCurrent)
+                    etAmount?.setText(result.format(2))
             }
         })
 
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
-            override fun onChangeAmount(amount: String) {
-                // TODO: Red_byte 2019-11-06 release it
+            override fun onChangeAmount(amount: String, position: Int) {
+                // TODO: Red_byte 2019-11-06 extract to method
+                val etCurrent = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
+                val item = adapterSource.items[position] as ExchangeRateView
+                val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
+                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val result = amount.toDouble() * rate
+                if (currentFocus == etCurrent)
+                    etAmount?.setText(result.format(2))
             }
         })
         adapterSource = DelegationAdapter()
@@ -80,6 +96,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvSource.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
+                // TODO: Red_byte 2019-11-06 extract to method
                 val item = adapterSource.items[position] as ExchangeRateView
                 val list = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
                 val mainList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
@@ -100,6 +117,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvReceiver.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
+                // TODO: Red_byte 2019-11-06 extract to method
                 val item = adapterReceiver.items[position] as ExchangeRateView
                 val list = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
                 val mainList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()

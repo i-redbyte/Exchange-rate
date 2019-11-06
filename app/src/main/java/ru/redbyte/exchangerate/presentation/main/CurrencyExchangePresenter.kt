@@ -10,6 +10,7 @@ import ru.redbyte.exchangerate.domain.balance.GetBalance
 import ru.redbyte.exchangerate.domain.balance.Param
 import ru.redbyte.exchangerate.domain.balance.SaveBalance
 import ru.redbyte.exchangerate.domain.exchange.GetAllRates
+import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 import ru.redbyte.exchangerate.presentation.model.asView
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -20,11 +21,12 @@ class CurrencyExchangePresenter @Inject constructor(
         private val saveBalance: SaveBalance
 
 ) : BasePresenter<CurrencyExchangeContract.View>(), CurrencyExchangeContract.Presenter {
+    override var balance: Map<Currency, Double> = mapOf()
 
     override fun start() {
         getBalance()
         disposables += Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
-            .flatMap { getAllRates.execute(None).toObservable() }
+                .flatMap { getAllRates.execute(None).toObservable() }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map { it.map { exchangeRate -> exchangeRate.asView() } }
@@ -39,11 +41,21 @@ class CurrencyExchangePresenter @Inject constructor(
                 .subscribe({}) { view.showError(it.message) }
     }
 
+    override fun getRate(base: String, exchangeRate: ExchangeRateView): Double =
+            when (base) {
+                Currency.USD.name -> exchangeRate.rates.usd
+                Currency.GBP.name -> exchangeRate.rates.gbp
+                Currency.EUR.name -> exchangeRate.rates.eur
+                Currency.RUB.name -> exchangeRate.rates.rub
+                else -> 0.0
+            }
+
     private fun getBalance() {
         disposables += getBalance.execute(None)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ view.showBalance(it) }) { view.showError(it.message) }
+                .doOnSuccess { balance = it }
+                .subscribe(view::showBalance) { view.showError(it.message) }
     }
 
     companion object {

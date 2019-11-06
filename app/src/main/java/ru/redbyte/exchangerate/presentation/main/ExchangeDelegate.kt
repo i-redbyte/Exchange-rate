@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +35,7 @@ class ExchangeDelegate(
 
         return Holder(view, balance)
                 .apply {
-                    etAmount.setOnFocusChangeListener { view, hasFocus ->
+                    etAmount.setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
                     }
                     etAmount.addTextChangedListener(object : TextWatcher {
@@ -46,7 +45,7 @@ class ExchangeDelegate(
 
                         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                             if (s.isNotEmpty()) {
-                                listener.onChangeAmount(s.toString())
+                                listener.onChangeAmount(s.toString(), adapterPosition)
                             }
                         }
                     })
@@ -72,7 +71,7 @@ class ExchangeDelegate(
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
 
             tvBase.text = item.base
-            tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.selectExchangeRate?.base?:"", item)}"
+            tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.selectExchangeRate?.base ?: "", item)}"
             val youHaveString = "${balance[valueOf(item.base)]}$symbol"
             tvYouHave.text = itemView.context.getString(R.string.currency_exchange_you_have, youHaveString)
         }
@@ -102,5 +101,5 @@ class ExchangeDelegate(
 }
 
 interface ExchangeListener {
-    fun onChangeAmount(amount: String)
+    fun onChangeAmount(amount: String, position: Int)
 }
