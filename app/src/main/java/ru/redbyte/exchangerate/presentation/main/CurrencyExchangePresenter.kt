@@ -22,6 +22,7 @@ class CurrencyExchangePresenter @Inject constructor(
 ) : BasePresenter<CurrencyExchangeContract.View>(), CurrencyExchangeContract.Presenter {
 
     override fun start() {
+        getBalance()
         disposables += Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
             .flatMap { getAllRates.execute(None).toObservable() }
             .subscribeOn(Schedulers.io())
