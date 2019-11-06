@@ -38,22 +38,12 @@ class ExchangeDelegate(
                     etAmount.setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
                     }
-                    etAmount.addTextChangedListener(object : TextWatcher {
-                        override fun afterTextChanged(s: Editable) = Unit
-
-                        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
-
-                        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                            if (s.isNotEmpty()) {
-                                listener.onChangeAmount(s.toString(), adapterPosition)
-                            }
-                        }
-                    })
                 }
     }
 
+    private val texts = mutableListOf("0.00", "0.00", "0.00", "0.00")
     override fun onBindViewHolder(item: ExchangeRateView, holder: Holder, payloads: List<Any>) =
-            holder.bind(item)
+            holder.bind(item, texts, listener)
 
     class Holder(
             itemView: View,
@@ -66,14 +56,36 @@ class ExchangeDelegate(
         val etAmount: EditText = requireViewById(itemView, R.id.etAmount)
 
         @SuppressLint("SetTextI18n")
-        fun bind(item: ExchangeRateView) {
+        fun bind(
+                item: ExchangeRateView,
+                texts: MutableList<String>,
+                listener: ExchangeListener
+        ) {
             val symbol = getCurrencySymbol(item.base, itemView.context)
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
-
             tvBase.text = item.base
             tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.selectExchangeRate?.base ?: "", item)}"
             val youHaveString = "${balance[valueOf(item.base)]}$symbol"
             tvYouHave.text = itemView.context.getString(R.string.currency_exchange_you_have, youHaveString)
+
+            etAmount.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable) = Unit
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    if (s.isNotEmpty()) {
+                        texts[adapterPosition] = s.toString()
+                        if (texts[adapterPosition] != s.toString())
+                            listener.onChangeAmount(s.toString(), adapterPosition)
+                    }
+                }
+            })
+            etAmount.setText(texts[adapterPosition])
+            if (texts[adapterPosition] != "0.00") {
+                listener.updateRateResult(texts[adapterPosition], adapterPosition)
+                texts[adapterPosition] = "0.00"
+            }
         }
 
         private fun getCurrencySymbol(base: String, context: Context): String =
@@ -102,4 +114,5 @@ class ExchangeDelegate(
 
 interface ExchangeListener {
     fun onChangeAmount(amount: String, position: Int)
+    fun updateRateResult(amount: String, position: Int)
 }

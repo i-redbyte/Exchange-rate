@@ -76,6 +76,14 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 if (currentFocus == etCurrent)
                     etAmount?.setText(result.format(2))
             }
+
+            override fun updateRateResult(amount: String, position: Int) {
+                val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
+                val item = adapterSource.items[position] as ExchangeRateView
+                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val result = amount.toDouble() * rate
+                etAmount?.setText(result.format(2))
+            }
         })
 
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
@@ -88,6 +96,14 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val result = amount.toDouble() * rate
                 if (currentFocus == etCurrent)
                     etAmount?.setText(result.format(2))
+            }
+
+            override fun updateRateResult(amount: String, position: Int) {
+                val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
+                val item = adapterSource.items[position] as ExchangeRateView
+                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val result = amount.toDouble() * rate
+                etAmount?.setText(result.format(2))
             }
         })
         adapterSource = DelegationAdapter()
