@@ -23,8 +23,8 @@ class CurrencyExchangePresenter @Inject constructor(
 
     override fun start() {
         getBalance()
-        disposables += Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
-            .flatMap { getAllRates.execute(None).toObservable() }
+        disposables += /*Observable.interval(0, REQUEST_PERIOD, TimeUnit.SECONDS)
+            .flatMap { */getAllRates.execute(None).toObservable() //}
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map { it.map { exchangeRate -> exchangeRate.asView() } }
@@ -47,6 +47,6 @@ class CurrencyExchangePresenter @Inject constructor(
     }
 
     companion object {
-        private const val REQUEST_PERIOD = 30L
+        private const val REQUEST_PERIOD = 5L
     }
 }

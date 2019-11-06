@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,9 @@ class ExchangeDelegate(
 ) : AbsListItemAdapterDelegate<ExchangeRateView, Any, ExchangeDelegate.Holder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    var selectExchangeRate: ExchangeRateView? = null
+//    var selectExchangeRate: ExchangeRateView? = null
+
+
     var balance: Map<Currency, Double> = mapOf()
 
     override fun isForViewType(item: Any, items: List<Any>, position: Int): Boolean =
@@ -34,7 +37,7 @@ class ExchangeDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): Holder {
         val view = inflater.inflate(R.layout.item_exchange, parent, false)
 
-        return Holder(view, selectExchangeRate, balance)
+        return Holder(view, /*selectExchangeRate,*/ balance)
             .apply {
                 etAmount.setOnFocusChangeListener { view, hasFocus ->
                     if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
@@ -58,7 +61,7 @@ class ExchangeDelegate(
 
     class Holder(
         itemView: View,
-        private val selectExchangeRate: ExchangeRateView?,
+//        private val selectExchangeRate: ExchangeRateView?,
         private val balance: Map<Currency, Double>
     ) : RecyclerView.ViewHolder(itemView) {
 
@@ -69,11 +72,12 @@ class ExchangeDelegate(
 
         @SuppressLint("SetTextI18n")
         fun bind(item: ExchangeRateView) {
+            Log.d("_debug","SELECT_BASE = ${item.selectExchangeRate?.base}")
             val symbol = getCurrencySymbol(item.base, itemView.context)
-            val symbolTarget = getCurrencySymbol(selectExchangeRate?.base ?: "", itemView.context)
+            val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
 
             tvBase.text = item.base
-            tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.base, selectExchangeRate)}"
+            tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.base, item.selectExchangeRate)}"
             val youHaveString = "${balance[valueOf(item.base)]}$symbol"
             tvYouHave.text = itemView.context.getString(R.string.currency_exchange_you_have, youHaveString)
         }
