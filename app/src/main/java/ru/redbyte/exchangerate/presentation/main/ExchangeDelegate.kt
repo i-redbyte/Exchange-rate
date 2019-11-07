@@ -58,8 +58,15 @@ class ExchangeDelegate(
     }
 
     private val texts = mutableListOf("0.00", "0.00", "0.00", "0.00")
-    override fun onBindViewHolder(item: ExchangeRateView, holder: Holder, payloads: List<Any>) =
-        holder.bind(item, texts, listener, balance, selectExchangeRate)
+    override fun onBindViewHolder(item: ExchangeRateView, holder: Holder, payloads: List<Any>) {
+        holder.bind(
+            item,
+            texts,
+            listener,
+            balance,
+            selectExchangeRate
+        )
+    }
 
     class Holder(
         itemView: View
@@ -109,11 +116,9 @@ class ExchangeDelegate(
                     }
                 }
             })
+
             etAmount.setText(texts[adapterPosition])
-            if (texts[adapterPosition] != "0.00") {
-                listener.updateRateResult(texts[adapterPosition], adapterPosition)
-                texts[adapterPosition] = "0.00"
-            }
+
         }
 
         private fun getCurrencySymbol(base: String, context: Context): String =
@@ -142,5 +147,4 @@ class ExchangeDelegate(
 
 interface ExchangeListener {
     fun onChangeAmount(amount: String, position: Int)
-    fun updateRateResult(amount: String, position: Int)
 }
