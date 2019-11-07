@@ -12,6 +12,7 @@ import ru.redbyte.exchangerate.domain.balance.SaveBalance
 import ru.redbyte.exchangerate.domain.exchange.GetAllRates
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 import ru.redbyte.exchangerate.presentation.model.asView
+import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -21,7 +22,8 @@ class CurrencyExchangePresenter @Inject constructor(
         private val saveBalance: SaveBalance
 
 ) : BasePresenter<CurrencyExchangeContract.View>(), CurrencyExchangeContract.Presenter {
-    override var balance: MutableMap<Currency, Double> = mutableMapOf()
+
+    override var balance: MutableMap<Currency, BigDecimal> = mutableMapOf()
 
     override fun start() {
         getBalance()
@@ -33,7 +35,7 @@ class CurrencyExchangePresenter @Inject constructor(
                 .subscribe(view::showBaseExchangeRate) { view.showError(it.message) }
     }
 
-    override fun saveBalance(balance: Map<Currency, Double>) {
+    override fun saveBalance(balance: Map<Currency, BigDecimal>) {
         disposables += saveBalance.execute(Param(balance))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -41,20 +43,20 @@ class CurrencyExchangePresenter @Inject constructor(
                 .subscribe({}) { view.showError(it.message) }
     }
 
-    override fun getRate(base: String, exchangeRate: ExchangeRateView): Double =
+    override fun getRate(base: String, exchangeRate: ExchangeRateView): BigDecimal =
             when (base) {
                 Currency.USD.name -> exchangeRate.rates.usd
                 Currency.GBP.name -> exchangeRate.rates.gbp
                 Currency.EUR.name -> exchangeRate.rates.eur
                 Currency.RUB.name -> exchangeRate.rates.rub
-                else -> 0.0
+                else -> BigDecimal(0.0)
             }
 
     override fun calculateBalance(
             selectBase: Currency,
             targetBase: Currency,
-            rateSelect: Double,
-            rateTarget: Double
+            rateSelect: BigDecimal,
+            rateTarget: BigDecimal
     ) {
         balance[targetBase] = balance[targetBase]!! - rateSelect
         balance[selectBase] = balance[selectBase]!! + rateTarget
