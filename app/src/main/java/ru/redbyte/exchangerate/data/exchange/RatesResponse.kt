@@ -15,8 +15,8 @@ class RatesResponse(
 )
 
 fun RatesResponse.toRates() = Rates(
-        eur = eur,
-        gbp = gbp,
-        usd = usd,
-        rub = rub
+        eur = eur.toBigDecimal(),
+        gbp = gbp.toBigDecimal(),
+        usd = usd.toBigDecimal(),
+        rub = rub.toBigDecimal()
 )

@@ -18,6 +18,7 @@ import ru.redbyte.exchangerate.base.extension.format
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.data.exchange.Currency.*
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
+import java.math.BigDecimal
 
 class ExchangeDelegate(
         context: Context,
@@ -26,7 +27,7 @@ class ExchangeDelegate(
 ) : AbsListItemAdapterDelegate<ExchangeRateView, Any, ExchangeDelegate.Holder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    var balance: Map<Currency, Double> = mapOf()
+    var balance: Map<Currency, BigDecimal> = mapOf<Currency, BigDecimal>()
         set(value) {
             adapter.notifyDataSetChanged()
             field = value
@@ -65,13 +66,15 @@ class ExchangeDelegate(
                 item: ExchangeRateView,
                 texts: MutableList<String>,
                 listener: ExchangeListener,
-                balance: Map<Currency, Double>
+                balance: Map<Currency, BigDecimal>
         ) {
             val symbol = getCurrencySymbol(item.base, itemView.context)
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
             tvBase.text = item.base
             tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.selectExchangeRate?.base ?: "", item)}"
+
             val youHaveString = "${balance[valueOf(item.base)]?.format(2)}$symbol"
+
             tvYouHave.text = itemView.context.getString(R.string.currency_exchange_you_have, youHaveString)
 
             etAmount.addTextChangedListener(object : TextWatcher {

@@ -18,6 +18,7 @@ import ru.redbyte.exchangerate.base.extension.setActionBar
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
+import java.math.BigDecimal
 
 class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter>(),
         CurrencyExchangeContract.View {
@@ -26,8 +27,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private lateinit var adapterReceiver: DelegationAdapter
     private lateinit var sourceDelegate: ExchangeDelegate
     private lateinit var receiverDelegate: ExchangeDelegate
-    private var amountRate: Double = 0.0
-    private var selectRateResult: Double = 0.0
+    private var amountRate: BigDecimal = BigDecimal(0.0)
+    private var selectRateResult: BigDecimal = BigDecimal(0.0)
     private var selectBase: Currency = Currency.USD
     private var targetBase: Currency = Currency.USD
 
@@ -91,10 +92,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
                 val etCurrent = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
-                val result = amount.toDouble() * rate
+                val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvSource) != -1) {
                     val target = adapterSource.items[getCurrentPosition(rvSource)] as ExchangeRateView
-                    amountRate = amount.toDouble()
+                    amountRate = amount.toBigDecimal()
                     selectBase = Currency.valueOf(item.base)
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
@@ -107,7 +108,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
-                val result = amount.toDouble() * rate
+                val result = amount.toBigDecimal() * rate
                 etAmount?.setText(result.format(2))
             }
         }, adapterReceiver)
@@ -119,10 +120,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val item = adapterSource.items[position] as ExchangeRateView
                 val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
-                val result = amount.toDouble() * rate
+                val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvReceiver) != -1) {
                     val target = adapterReceiver.items[getCurrentPosition(rvReceiver)] as ExchangeRateView
-                    amountRate = amount.toDouble()
+                    amountRate = amount.toBigDecimal()
                     selectBase = Currency.valueOf(item.base)
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
@@ -135,7 +136,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
-                val result = amount.toDouble() * rate
+                val result = amount.toBigDecimal() * rate
                 etAmount?.setText(result.format(2))
             }
         }, adapterSource)
@@ -187,7 +188,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private fun getCurrentPosition(rv: RecyclerView): Int =
             (rv.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
-    override fun showBalance(balance: Map<Currency, Double>) {
+    override fun showBalance(balance: Map<Currency, BigDecimal>) {
         sourceDelegate.balance = balance
         receiverDelegate.balance = balance
     }

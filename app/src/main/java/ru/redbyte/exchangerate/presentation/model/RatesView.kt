@@ -3,13 +3,14 @@ package ru.redbyte.exchangerate.presentation.model
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import ru.redbyte.exchangerate.domain.Rates
+import java.math.BigDecimal
 
 @Parcelize
 class RatesView(
-        val eur: Double,
-        val gbp: Double,
-        val usd: Double,
-        val rub: Double
+        val eur: BigDecimal,
+        val gbp: BigDecimal,
+        val usd: BigDecimal,
+        val rub: BigDecimal
 ) : Parcelable
 
 fun Rates.asView() = RatesView(

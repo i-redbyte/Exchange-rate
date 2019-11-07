@@ -1,8 +1,10 @@
 package ru.redbyte.exchangerate.domain
 
+import java.math.BigDecimal
+
 class Rates(
-        val eur: Double,
-        val gbp: Double,
-        val usd: Double,
-        val rub: Double
+        val eur: BigDecimal,
+        val gbp: BigDecimal,
+        val usd: BigDecimal,
+        val rub: BigDecimal
 )
