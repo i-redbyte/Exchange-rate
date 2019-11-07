@@ -51,6 +51,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private fun calculateExchangeRate() {
         if (presenter.balance[targetBase]!! >= selectRateResult) {
             presenter.calculateBalance(selectBase, targetBase, selectRateResult, amountRate)
+            sourceDelegate.balance = presenter.balance
+            receiverDelegate.balance = presenter.balance
         } else {
             showError(getString(R.string.error_balance))
         }
@@ -79,6 +81,9 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     }
 
     private fun setupRecyclerView() {
+        adapterSource = DelegationAdapter()
+        adapterReceiver = DelegationAdapter()
+
         receiverDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String, position: Int) {
                 // TODO: Red_byte 2019-11-06 extract to method
@@ -105,7 +110,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val result = amount.toDouble() * rate
                 etAmount?.setText(result.format(2))
             }
-        })
+        }, adapterReceiver)
 
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String, position: Int) {
@@ -133,9 +138,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val result = amount.toDouble() * rate
                 etAmount?.setText(result.format(2))
             }
-        })
-        adapterSource = DelegationAdapter()
-        adapterReceiver = DelegationAdapter()
+        }, adapterSource)
         //************Source RV************
 
         rvSource.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {

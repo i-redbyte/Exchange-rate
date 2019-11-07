@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat.requireViewById
 import androidx.recyclerview.widget.RecyclerView
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 import ru.redbyte.exchangerate.R
+import ru.redbyte.exchangerate.base.DelegationAdapter
 import ru.redbyte.exchangerate.base.extension.format
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.data.exchange.Currency.*
@@ -20,11 +21,16 @@ import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 
 class ExchangeDelegate(
         context: Context,
-        private val listener: ExchangeListener
+        private val listener: ExchangeListener,
+        private val adapter: DelegationAdapter
 ) : AbsListItemAdapterDelegate<ExchangeRateView, Any, ExchangeDelegate.Holder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
     var balance: Map<Currency, Double> = mapOf()
+        set(value) {
+            adapter.notifyDataSetChanged()
+            field = value
+        }
 
     override fun isForViewType(item: Any, items: List<Any>, position: Int): Boolean =
             item is ExchangeRateView
@@ -33,7 +39,7 @@ class ExchangeDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): Holder {
         val view = inflater.inflate(R.layout.item_exchange, parent, false)
 
-        return Holder(view, balance)
+        return Holder(view)
                 .apply {
                     etAmount.setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus.not() && etAmount.text.isEmpty()) etAmount.setText(itemView.context.getString(R.string.zero))
@@ -43,11 +49,10 @@ class ExchangeDelegate(
 
     private val texts = mutableListOf("0.00", "0.00", "0.00", "0.00")
     override fun onBindViewHolder(item: ExchangeRateView, holder: Holder, payloads: List<Any>) =
-            holder.bind(item, texts, listener)
+            holder.bind(item, texts, listener, balance)
 
     class Holder(
-            itemView: View,
-            private val balance: Map<Currency, Double>
+            itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val tvBase: TextView = requireViewById(itemView, R.id.tvBase)
@@ -59,7 +64,8 @@ class ExchangeDelegate(
         fun bind(
                 item: ExchangeRateView,
                 texts: MutableList<String>,
-                listener: ExchangeListener
+                listener: ExchangeListener,
+                balance: Map<Currency, Double>
         ) {
             val symbol = getCurrencySymbol(item.base, itemView.context)
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
@@ -75,8 +81,10 @@ class ExchangeDelegate(
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                     if (s.isNotEmpty()) {
-                        texts[adapterPosition] = s.toString()
+                        if (adapterPosition != -1) {
+                            texts[adapterPosition] = s.toString()
                             listener.onChangeAmount(s.toString(), adapterPosition)
+                        }
                     }
                 }
             })
