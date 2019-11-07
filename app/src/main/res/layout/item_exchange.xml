@@ -67,6 +67,7 @@
             android:textSize="@dimen/card_text_size_bottom"
             app:layout_constraintEnd_toEndOf="@+id/etAmount"
             app:layout_constraintStart_toStartOf="@+id/etAmount"
+            app:layout_constraintStart_toEndOf="@+id/tvYouHave"
             app:layout_constraintTop_toBottomOf="@+id/etAmount"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,6 @@ package ru.redbyte.exchangerate.presentation.main
 
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -202,11 +201,15 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     }
 
     override fun showOkChangeBalance() {
-        Snackbar.make(btnExchange, "SUCCESS CHANGE BALANCE!", Snackbar.LENGTH_LONG).show()
+        Snackbar
+                .make(btnExchange, "SUCCESS CHANGE BALANCE!", Snackbar.LENGTH_LONG)
+                .show()
     }
 
     override fun showError(message: String?) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Snackbar
+                .make(btnExchange, message ?: "Error with empty body", Snackbar.LENGTH_LONG)
+                .show()
     }
 
     private fun setupActionBar() = setActionBar(findViewById(R.id.tActionBar)) {
