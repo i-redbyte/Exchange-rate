@@ -8,13 +8,11 @@ import ru.redbyte.exchangerate.domain.ExchangeRate
 class ExchangeRateView(
     val base: String,
     val date: String,
-    val rates: RatesView,
-    var selectExchangeRate: ExchangeRateView?
+    val rates: RatesView
 ):Parcelable
 
 fun ExchangeRate.asView() = ExchangeRateView(
     base = base,
     date = date,
-    rates = rates.asView(),
-    selectExchangeRate = null
+    rates = rates.asView()
 )
