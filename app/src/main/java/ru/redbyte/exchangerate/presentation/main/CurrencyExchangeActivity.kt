@@ -2,7 +2,6 @@ package ru.redbyte.exchangerate.presentation.main
 
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -103,13 +102,15 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String, position: Int) {
                 // TODO: Red_byte 2019-11-06 extract to method
-                val etCurrent =
-                        rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))
-                                ?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
                 val etAmount =
                         rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))
                                 ?.findViewById<EditText>(R.id.etAmount)
+
+                val etCurrent =
+                        rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))
+                                ?.findViewById<EditText>(R.id.etAmount)
+
                 val rate = presenter.getRate(sourceDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvReceiver) != -1) {
@@ -120,8 +121,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
                 }
-                if (currentFocus == etCurrent && isUpdate.get())
-                    etAmount?.setText(result.format(2))
+//                if (currentFocus == etCurrent && isUpdate.get())
+//                    etAmount?.setText(result.format(2))
             }
 
         }, adapterSource)
@@ -129,7 +130,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvSource.attachSnapHelperWithListener(
                 PagerSnapHelper(),
-                NOTIFY_ON_SCROLL,
+                NOTIFY_ON_SCROLL_STATE_IDLE,
                 object : OnChangeSnapPositionListener {
                     override fun onSnapPositionChange(position: Int) {
                         // FIXME: 2019-11-07 REFACTORING THIS BLOCK!
@@ -202,11 +203,15 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     }
 
     override fun showOkChangeBalance() {
-        Snackbar.make(btnExchange, "SUCCESS CHANGE BALANCE!", Snackbar.LENGTH_LONG).show()
+        Snackbar
+                .make(btnExchange, "SUCCESS CHANGE BALANCE!", Snackbar.LENGTH_LONG)
+                .show()
     }
 
     override fun showError(message: String?) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Snackbar
+                .make(btnExchange, message ?: "Error with empty body", Snackbar.LENGTH_LONG)
+                .show()
     }
 
     private fun setupActionBar() = setActionBar(findViewById(R.id.tActionBar)) {
