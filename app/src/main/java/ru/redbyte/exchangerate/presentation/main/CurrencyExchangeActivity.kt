@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_currency_exchange.*
 import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
@@ -25,6 +26,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private lateinit var adapterReceiver: DelegationAdapter
     private lateinit var sourceDelegate: ExchangeDelegate
     private lateinit var receiverDelegate: ExchangeDelegate
+    private var amountRate: Double = 0.0
+    private var selectRateResult: Double = 0.0
+    private var selectBase: Currency = Currency.USD
+    private var targetBase: Currency = Currency.USD
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,15 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         btnExchange.setOnClickListener {
             rvSource.clearFocus()
             rvReceiver.clearFocus()
+            calculateExchangeRate()
+        }
+    }
+
+    private fun calculateExchangeRate() {
+        if (presenter.balance[targetBase]!! >= selectRateResult) {
+            presenter.calculateBalance(selectBase, targetBase, selectRateResult, amountRate)
+        } else {
+            showError(getString(R.string.error_balance))
         }
     }
 
@@ -73,6 +87,13 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etCurrent = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
                 val result = amount.toDouble() * rate
+                if (getCurrentPosition(rvSource) != -1) {
+                    val target = adapterSource.items[getCurrentPosition(rvSource)] as ExchangeRateView
+                    amountRate = amount.toDouble()
+                    selectBase = Currency.valueOf(item.base)
+                    targetBase = Currency.valueOf(target.base)
+                    selectRateResult = result
+                }
                 if (currentFocus == etCurrent)
                     etAmount?.setText(result.format(2))
             }
@@ -94,6 +115,13 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
                 val result = amount.toDouble() * rate
+                if (getCurrentPosition(rvReceiver) != -1) {
+                    val target = adapterReceiver.items[getCurrentPosition(rvReceiver)] as ExchangeRateView
+                    amountRate = amount.toDouble()
+                    selectBase = Currency.valueOf(item.base)
+                    targetBase = Currency.valueOf(target.base)
+                    selectRateResult = result
+                }
                 if (currentFocus == etCurrent)
                     etAmount?.setText(result.format(2))
             }
@@ -159,6 +187,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     override fun showBalance(balance: Map<Currency, Double>) {
         sourceDelegate.balance = balance
         receiverDelegate.balance = balance
+    }
+
+    override fun showOkChangeBalance() {
+        Snackbar.make(btnExchange, "SUCCESS CHANGE BALANCE!", Snackbar.LENGTH_LONG).show()
     }
 
     override fun showError(message: String?) {

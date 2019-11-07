@@ -21,7 +21,7 @@ class CurrencyExchangePresenter @Inject constructor(
         private val saveBalance: SaveBalance
 
 ) : BasePresenter<CurrencyExchangeContract.View>(), CurrencyExchangeContract.Presenter {
-    override var balance: Map<Currency, Double> = mapOf()
+    override var balance: MutableMap<Currency, Double> = mutableMapOf()
 
     override fun start() {
         getBalance()
@@ -50,11 +50,23 @@ class CurrencyExchangePresenter @Inject constructor(
                 else -> 0.0
             }
 
+    override fun calculateBalance(
+            selectBase: Currency,
+            targetBase: Currency,
+            rateSelect: Double,
+            rateTarget: Double
+    ) {
+        balance[targetBase] = balance[targetBase]!! - rateSelect
+        balance[selectBase] = balance[selectBase]!! + rateTarget
+        saveBalance(balance.toMap())
+        view.showOkChangeBalance()
+    }
+
     private fun getBalance() {
         disposables += getBalance.execute(None)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess { balance = it }
+                .doOnSuccess { balance = it.toMutableMap() }
                 .subscribe(view::showBalance) { view.showError(it.message) }
     }
 

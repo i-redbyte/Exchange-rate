@@ -65,7 +65,7 @@ class ExchangeDelegate(
             val symbolTarget = getCurrencySymbol(item.selectExchangeRate?.base ?: "", itemView.context)
             tvBase.text = item.base
             tvRate.text = "${symbol}1 = $symbolTarget${getRate(item.selectExchangeRate?.base ?: "", item)}"
-            val youHaveString = "${balance[valueOf(item.base)]}$symbol"
+            val youHaveString = "${balance[valueOf(item.base)]?.format(2)}$symbol"
             tvYouHave.text = itemView.context.getString(R.string.currency_exchange_you_have, youHaveString)
 
             etAmount.addTextChangedListener(object : TextWatcher {
@@ -76,7 +76,6 @@ class ExchangeDelegate(
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                     if (s.isNotEmpty()) {
                         texts[adapterPosition] = s.toString()
-                        if (texts[adapterPosition] != s.toString())
                             listener.onChangeAmount(s.toString(), adapterPosition)
                     }
                 }

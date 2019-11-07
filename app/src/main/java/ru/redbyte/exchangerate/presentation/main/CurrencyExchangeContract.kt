@@ -10,11 +10,18 @@ interface CurrencyExchangeContract {
         fun showError(message: String?)
         fun showBaseExchangeRate(list: List<ExchangeRateView>)
         fun showBalance(balance: Map<Currency, Double>)
+        fun showOkChangeBalance()
     }
 
     interface Presenter : BaseContract.Presenter {
-        var balance: Map<Currency, Double>
+        var balance: MutableMap<Currency, Double>
         fun saveBalance(balance: Map<Currency, Double>)
         fun getRate(base: String, exchangeRate: ExchangeRateView): Double
+        fun calculateBalance(
+                selectBase: Currency,
+                targetBase: Currency,
+                rateSelect: Double,
+                rateTarget: Double
+        )
     }
 }
