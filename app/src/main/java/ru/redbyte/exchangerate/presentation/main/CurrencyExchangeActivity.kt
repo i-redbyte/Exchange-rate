@@ -19,6 +19,7 @@ import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.N
 import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
 import ru.redbyte.exchangerate.presentation.model.ExchangeRateView
 import java.math.BigDecimal
+import java.util.concurrent.atomic.AtomicBoolean
 
 class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter>(),
         CurrencyExchangeContract.View {
@@ -31,6 +32,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     private var selectRateResult: BigDecimal = BigDecimal(0.0)
     private var selectBase: Currency = Currency.USD
     private var targetBase: Currency = Currency.USD
+    private var isUpdate = AtomicBoolean(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,18 +94,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
                 }
-//                if (currentFocus == etCurrent)
-//                    etAmount?.setText(result.format(2))
+                if (currentFocus == etCurrent && isUpdate.get())
+                    etAmount?.setText(result.format(2))
             }
 
-//            override fun updateRateResult(amount: String, position: Int) {
-//                val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
-//                val item = adapterSource.items[position] as ExchangeRateView
-//                val rate = presenter.getRate(receiverDelegate.selectExchangeRate?.base ?: "", item)
-//                val result = amount.toBigDecimal() * rate
-//                etAmount?.setText(result.format(2))
-//
-//            }
         }, adapterReceiver)
 
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
@@ -126,17 +120,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
                 }
-//                if (currentFocus == etCurrent)
-//                    etAmount?.setText(result.format(2))
+                if (currentFocus == etCurrent && isUpdate.get())
+                    etAmount?.setText(result.format(2))
             }
 
-//            override fun updateRateResult(amount: String, position: Int) {
-//                val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
-//                val item = adapterSource.items[position] as ExchangeRateView
-//                val rate = presenter.getRate(sourceDelegate.selectExchangeRate?.base ?: "", item)
-//                val result = amount.toBigDecimal() * rate
-//                etAmount?.setText(result.format(2))
-//            }
         }, adapterSource)
         //************Source RV************
 
@@ -145,6 +132,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 NOTIFY_ON_SCROLL,
                 object : OnChangeSnapPositionListener {
                     override fun onSnapPositionChange(position: Int) {
+                        // FIXME: 2019-11-07 REFACTORING THIS BLOCK!
+                        isUpdate.set(false)
                         val item = adapterSource.items[position] as ExchangeRateView
                         val targetItem =
                                 adapterReceiver.items[getCurrentPosition(rvReceiver)] as ExchangeRateView
@@ -162,6 +151,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                         etCurrent?.setText(result.format(2))
                         receiverDelegate.selectExchangeRate = item
                         sourceDelegate.selectExchangeRate = targetItem
+                        isUpdate.set(true)
                     }
                 })
         rvSource.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -175,6 +165,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 NOTIFY_ON_SCROLL_STATE_IDLE,
                 object : OnChangeSnapPositionListener {
                     override fun onSnapPositionChange(position: Int) {
+                        // FIXME: 2019-11-07 REFACTORING THIS BLOCK!
+                        isUpdate.set(false)
                         val item = adapterReceiver.items[position] as ExchangeRateView
                         val targetItem =
                                 adapterSource.items[getCurrentPosition(rvSource)] as ExchangeRateView
@@ -192,6 +184,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
                         receiverDelegate.selectExchangeRate = targetItem
                         sourceDelegate.selectExchangeRate = item
+                        isUpdate.set(true)
                     }
                 })
 

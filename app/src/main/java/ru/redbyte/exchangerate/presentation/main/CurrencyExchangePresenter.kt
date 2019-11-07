@@ -73,6 +73,6 @@ class CurrencyExchangePresenter @Inject constructor(
     }
 
     companion object {
-        private const val REQUEST_PERIOD = 15L
+        private const val REQUEST_PERIOD = 30L
     }
 }
