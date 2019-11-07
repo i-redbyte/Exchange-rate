@@ -60,24 +60,11 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
     }
 
     override fun showBaseExchangeRate(list: List<ExchangeRateView>) {
-        val sList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
-        val rList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
-
-        if (sList.isNullOrEmpty().not() && rList.isNullOrEmpty().not()) {
-            for ((index, value) in list.withIndex()) {
-                val sTmp = sList[index].selectExchangeRate
-                val rTmp = rList[index].selectExchangeRate
-                sList[index] = value
-                sList[index].selectExchangeRate = sTmp
-                rList[index] = value
-                rList[index].selectExchangeRate = rTmp
-                adapterSource.items = sList
-                adapterReceiver.items = rList
-            }
-        } else {
-            list.first().selectExchangeRate = list.first()
-            adapterSource.items = list
-            adapterReceiver.items = list
+        adapterSource.items = list
+        adapterReceiver.items = list
+        if (sourceDelegate.selectExchangeRate == null && receiverDelegate.selectExchangeRate == null) {
+            sourceDelegate.selectExchangeRate = list.firstOrNull()
+            receiverDelegate.selectExchangeRate = list.firstOrNull()
         }
     }
 
@@ -91,7 +78,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val item = adapterReceiver.items[position] as ExchangeRateView
                 val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
                 val etCurrent = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
-                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val rate = presenter.getRate(receiverDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvSource) != -1) {
                     val target = adapterSource.items[getCurrentPosition(rvSource)] as ExchangeRateView
@@ -107,7 +94,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
             override fun updateRateResult(amount: String, position: Int) {
                 val etAmount = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
-                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val rate = presenter.getRate(receiverDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 etAmount?.setText(result.format(2))
             }
@@ -119,7 +106,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                 val etCurrent = rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
                 val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
-                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val rate = presenter.getRate(sourceDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvReceiver) != -1) {
                     val target = adapterReceiver.items[getCurrentPosition(rvReceiver)] as ExchangeRateView
@@ -135,7 +122,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
             override fun updateRateResult(amount: String, position: Int) {
                 val etAmount = rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
-                val rate = presenter.getRate(item.selectExchangeRate?.base ?: "", item)
+                val rate = presenter.getRate(sourceDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 etAmount?.setText(result.format(2))
             }
@@ -144,17 +131,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvSource.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
-                // TODO: Red_byte 2019-11-06 extract to method
                 val item = adapterSource.items[position] as ExchangeRateView
-                val list = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
-                val mainList = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
-                val targetItem = list[getCurrentPosition(rvReceiver)]
-                mainList[position].selectExchangeRate = targetItem
-
-                targetItem.selectExchangeRate = item
-                list[getCurrentPosition(rvReceiver)] = targetItem
-                adapterReceiver.setItems(list, Payload.UPDATE)
-                adapterSource.setItems(mainList, Payload.UPDATE)
+                val targetItem = adapterReceiver.items[getCurrentPosition(rvReceiver)] as ExchangeRateView
+                receiverDelegate.selectExchangeRate = item
+                sourceDelegate.selectExchangeRate = targetItem
             }
         })
         rvSource.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -165,18 +145,10 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvReceiver.attachSnapHelperWithListener(PagerSnapHelper(), NOTIFY_ON_SCROLL_STATE_IDLE, object : OnChangeSnapPositionListener {
             override fun onSnapPositionChange(position: Int) {
-                // TODO: Red_byte 2019-11-06 extract to method
                 val item = adapterReceiver.items[position] as ExchangeRateView
-                val list = adapterSource.items.map { it as ExchangeRateView }.toMutableList()
-                val mainList = adapterReceiver.items.map { it as ExchangeRateView }.toMutableList()
-                val targetItem = list[getCurrentPosition(rvSource)]
-                mainList[position].selectExchangeRate = targetItem
-
-                targetItem.selectExchangeRate = item
-                list[getCurrentPosition(rvSource)] = targetItem
-                adapterSource.setItems(list, Payload.UPDATE)
-                adapterReceiver.setItems(mainList, Payload.UPDATE)
-
+                val targetItem = adapterSource.items[getCurrentPosition(rvSource)]as ExchangeRateView
+                receiverDelegate.selectExchangeRate = targetItem
+                sourceDelegate.selectExchangeRate = item
             }
         })
 
