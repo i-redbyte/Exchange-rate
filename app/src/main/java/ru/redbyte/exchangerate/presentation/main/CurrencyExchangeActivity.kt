@@ -102,13 +102,15 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         sourceDelegate = ExchangeDelegate(this, object : ExchangeListener {
             override fun onChangeAmount(amount: String, position: Int) {
                 // TODO: Red_byte 2019-11-06 extract to method
-                val etCurrent =
-                        rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))
-                                ?.findViewById<EditText>(R.id.etAmount)
                 val item = adapterSource.items[position] as ExchangeRateView
                 val etAmount =
                         rvReceiver.layoutManager?.findViewByPosition(getCurrentPosition(rvReceiver))
                                 ?.findViewById<EditText>(R.id.etAmount)
+
+                val etCurrent =
+                        rvSource.layoutManager?.findViewByPosition(getCurrentPosition(rvSource))
+                                ?.findViewById<EditText>(R.id.etAmount)
+
                 val rate = presenter.getRate(sourceDelegate.selectExchangeRate?.base ?: "", item)
                 val result = amount.toBigDecimal() * rate
                 if (getCurrentPosition(rvReceiver) != -1) {
@@ -119,8 +121,8 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                     targetBase = Currency.valueOf(target.base)
                     selectRateResult = result
                 }
-                if (currentFocus == etCurrent && isUpdate.get())
-                    etAmount?.setText(result.format(2))
+//                if (currentFocus == etCurrent && isUpdate.get())
+//                    etAmount?.setText(result.format(2))
             }
 
         }, adapterSource)
@@ -128,7 +130,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
 
         rvSource.attachSnapHelperWithListener(
                 PagerSnapHelper(),
-                NOTIFY_ON_SCROLL,
+                NOTIFY_ON_SCROLL_STATE_IDLE,
                 object : OnChangeSnapPositionListener {
                     override fun onSnapPositionChange(position: Int) {
                         // FIXME: 2019-11-07 REFACTORING THIS BLOCK!
