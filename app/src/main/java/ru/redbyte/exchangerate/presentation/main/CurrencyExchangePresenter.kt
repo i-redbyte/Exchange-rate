@@ -60,7 +60,7 @@ class CurrencyExchangePresenter @Inject constructor(
             exchangeRate: ExchangeRateView
     ) {
         val result = amountRate * getRate(targetBase, exchangeRate)
-        if (balance[targetBase]!! >= result) {
+        if (balance[selectBase]!! >= result) {
             balance[selectBase] = balance[selectBase]!! - amountRate
             balance[targetBase] = balance[targetBase]!! + result
             saveBalance(balance.toMap())
