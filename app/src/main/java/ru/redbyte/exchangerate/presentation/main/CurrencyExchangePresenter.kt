@@ -1,10 +1,10 @@
 package ru.redbyte.exchangerate.presentation.main
 
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.redbyte.exchangerate.base.BasePresenter
+import ru.redbyte.exchangerate.base.extension.format
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.data.exchange.Currency.*
 import ru.redbyte.exchangerate.domain.UseCase.None
@@ -60,7 +60,6 @@ class CurrencyExchangePresenter @Inject constructor(
             exchangeRate: ExchangeRateView
     ) {
         val result = amountRate * getRate(targetBase, exchangeRate)
-        Log.d("_debug","$result")
         if (balance[targetBase]!! >= result) {
             balance[selectBase] = balance[selectBase]!! - amountRate
             balance[targetBase] = balance[targetBase]!! + result
@@ -69,6 +68,16 @@ class CurrencyExchangePresenter @Inject constructor(
         } else {
             view.showError("Error! Not enough funds in your account.")
         }
+    }
+
+    override fun previewCalculateBalance(
+            selectBase: Currency,
+            targetBase: Currency,
+            amountRate: BigDecimal,
+            exchangeRate: ExchangeRateView
+    ) {
+        val result = amountRate * getRate(targetBase, exchangeRate)
+        view.showPreview(result.format(3))
     }
 
     private fun getBalance() {

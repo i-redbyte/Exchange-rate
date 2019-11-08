@@ -10,6 +10,7 @@ import ru.redbyte.exchangerate.R
 import ru.redbyte.exchangerate.base.BaseActivity
 import ru.redbyte.exchangerate.base.DelegationAdapter
 import ru.redbyte.exchangerate.base.extension.attachSnapHelperWithListener
+import ru.redbyte.exchangerate.base.extension.onTextChanged
 import ru.redbyte.exchangerate.base.extension.setActionBar
 import ru.redbyte.exchangerate.data.exchange.Currency
 import ru.redbyte.exchangerate.presentation.main.SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
@@ -37,6 +38,18 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
         setupActionBar()
         setupRecyclerViews()
         btnExchange.setOnClickListener { onExchangeRateClick() }
+        etAmount.setText(getString(R.string.zero))
+        etAmount.onTextChanged { amount ->
+            if (amount.isNotEmpty()) {
+                updatePreview(amount.toString())
+            }
+        }
+        tvPreview.text = getString(R.string.currency_exchange_preview, etAmount.text.toString(), selectBase, etAmount.text.toString(), targetBase)
+    }
+
+    override fun showPreview(preview: String) {
+        val amount = etAmount.text.toString()
+        tvPreview.text = getString(R.string.currency_exchange_preview, amount, selectBase, preview, targetBase)
     }
 
     override fun updateBalance() {
@@ -88,6 +101,7 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                         selectBase = item.base
                         receiverDelegate.selectExchangeRate = item
                         sourceDelegate.selectExchangeRate = targetItem
+                        updatePreview(etAmount.text.toString())
                     }
                 })
         rvSource.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -107,12 +121,21 @@ class CurrencyExchangeActivity : BaseActivity<CurrencyExchangeContract.Presenter
                         targetBase = item.base
                         sourceDelegate.selectExchangeRate = item
                         receiverDelegate.selectExchangeRate = targetItem
+                        updatePreview(etAmount.text.toString())
                     }
                 })
 
         rvReceiver.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         adapterReceiver.delegatesManager.addDelegate(receiverDelegate)
         rvReceiver.adapter = adapterReceiver
+    }
+
+    private fun updatePreview(amount: String) {
+        val pos = getCurrentPosition(rvSource)
+        if (pos == -1) return
+        val item = adapterSource.items[pos] as ExchangeRateView
+        val amountRate = amount.toBigDecimal()
+        presenter.previewCalculateBalance(selectBase, targetBase, amountRate, item)
     }
 
     private fun getCurrentPosition(rv: RecyclerView): Int =

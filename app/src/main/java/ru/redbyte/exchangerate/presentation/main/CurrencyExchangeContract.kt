@@ -9,6 +9,7 @@ interface CurrencyExchangeContract {
 
     interface View : BaseContract.View {
         fun updateBalance()
+        fun showPreview(preview:String)
         fun showBaseExchangeRate(list: List<ExchangeRateView>)
         fun showBalance(balance: Map<Currency, BigDecimal>)
         fun showOkChangeBalance()
@@ -19,6 +20,12 @@ interface CurrencyExchangeContract {
         var balance: MutableMap<Currency, BigDecimal>
         fun saveBalance(balance: Map<Currency, BigDecimal>)
         fun calculateBalance(
+                selectBase: Currency,
+                targetBase: Currency,
+                amountRate: BigDecimal,
+                exchangeRate:ExchangeRateView
+        )
+        fun previewCalculateBalance(
                 selectBase: Currency,
                 targetBase: Currency,
                 amountRate: BigDecimal,

@@ -73,6 +73,20 @@
             />
 
         <TextView
+            android:id="@+id/tvPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/currency_exchange_preview"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etAmount"
+            tools:text="10->10"
+            />
+
+        <TextView
             android:id="@+id/tvAt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,7 +96,7 @@
             android:textSize="@dimen/card_text_size_bottom"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etAmount"
+            app:layout_constraintTop_toBottomOf="@+id/tvPreview"
             />
 
         <androidx.recyclerview.widget.RecyclerView
