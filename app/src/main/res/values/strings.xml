@@ -3,10 +3,13 @@
     <string name="currency_exchange_exchange">Exchange</string>
     <string name="currency_exchange_you_have">You have: %1$s</string>
     <string name="currency_exchange_rate">%1$s = %2$s</string>
+    <string name="currency_exchange_of">OF:</string>
+    <string name="currency_exchange_at">AT:</string>
+    <string name="currency_exchange_error_balance">Error! Not enough funds in your account.</string>
+    <string name="currency_exchange_success">SUCCESS CHANGE BALANCE!</string>
     <string name="usd">$</string>
     <string name="eur">€</string>
     <string name="gbp">£</string>
     <string name="rub">₽</string>
     <string name="zero">0.00</string>
-    <string name="error_balance">Error! Not enough funds in your account.</string>
 </resources>

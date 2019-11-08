@@ -8,21 +8,21 @@ import java.math.BigDecimal
 interface CurrencyExchangeContract {
 
     interface View : BaseContract.View {
-        fun showError(message: String?)
+        fun updateBalance()
         fun showBaseExchangeRate(list: List<ExchangeRateView>)
         fun showBalance(balance: Map<Currency, BigDecimal>)
         fun showOkChangeBalance()
+        fun showError(message: String?)
     }
 
     interface Presenter : BaseContract.Presenter {
         var balance: MutableMap<Currency, BigDecimal>
         fun saveBalance(balance: Map<Currency, BigDecimal>)
-        fun getRate(base: String, exchangeRate: ExchangeRateView): BigDecimal
         fun calculateBalance(
                 selectBase: Currency,
                 targetBase: Currency,
-                rateSelect: BigDecimal,
-                rateTarget: BigDecimal
+                amountRate: BigDecimal,
+                exchangeRate:ExchangeRateView
         )
     }
 }

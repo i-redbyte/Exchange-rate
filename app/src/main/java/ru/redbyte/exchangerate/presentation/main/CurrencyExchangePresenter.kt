@@ -1,10 +1,12 @@
 package ru.redbyte.exchangerate.presentation.main
 
+import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.redbyte.exchangerate.base.BasePresenter
 import ru.redbyte.exchangerate.data.exchange.Currency
+import ru.redbyte.exchangerate.data.exchange.Currency.*
 import ru.redbyte.exchangerate.domain.UseCase.None
 import ru.redbyte.exchangerate.domain.balance.GetBalance
 import ru.redbyte.exchangerate.domain.balance.Param
@@ -43,25 +45,30 @@ class CurrencyExchangePresenter @Inject constructor(
                 .subscribe({}) { view.showError(it.message) }
     }
 
-    override fun getRate(base: String, exchangeRate: ExchangeRateView): BigDecimal =
+    private fun getRate(base: Currency, exchangeRate: ExchangeRateView): BigDecimal =
             when (base) {
-                Currency.USD.name -> exchangeRate.rates.usd
-                Currency.GBP.name -> exchangeRate.rates.gbp
-                Currency.EUR.name -> exchangeRate.rates.eur
-                Currency.RUB.name -> exchangeRate.rates.rub
-                else -> BigDecimal(0.0)
+                USD -> exchangeRate.rates.usd
+                GBP -> exchangeRate.rates.gbp
+                EUR -> exchangeRate.rates.eur
+                RUB -> exchangeRate.rates.rub
             }
 
     override fun calculateBalance(
             selectBase: Currency,
             targetBase: Currency,
-            rateSelect: BigDecimal,
-            rateTarget: BigDecimal
+            amountRate: BigDecimal,
+            exchangeRate: ExchangeRateView
     ) {
-        balance[targetBase] = balance[targetBase]!! - rateSelect
-        balance[selectBase] = balance[selectBase]!! + rateTarget
-        saveBalance(balance.toMap())
-        view.showOkChangeBalance()
+        val result = amountRate * getRate(targetBase, exchangeRate)
+        Log.d("_debug","$result")
+        if (balance[targetBase]!! >= result) {
+            balance[selectBase] = balance[selectBase]!! - amountRate
+            balance[targetBase] = balance[targetBase]!! + result
+            saveBalance(balance.toMap())
+            view.updateBalance()
+        } else {
+            view.showError("Error! Not enough funds in your account.")
+        }
     }
 
     private fun getBalance() {

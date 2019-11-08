@@ -16,6 +16,19 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
+        <TextView
+            android:id="@+id/tvOf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/currency_exchange_of"
+            android:textSize="@dimen/card_text_size_bottom"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSource"
             android:layout_width="match_parent"
@@ -24,20 +37,52 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvOf"
             tools:itemCount="1"
             tools:listitem="@layout/item_exchange"
             />
 
         <Button
             android:id="@+id/btnExchange"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/currency_exchange_exchange"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/etAmount"
             app:layout_constraintTop_toBottomOf="@id/rvSource"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etAmount"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_edit_text"
+            android:gravity="center"
+            android:inputType="numberDecimal"
+            android:maxLength="15"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btnExchange"
+            app:layout_constraintEnd_toStartOf="@+id/btnExchange"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btnExchange"
+            />
+
+        <TextView
+            android:id="@+id/tvAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/currency_exchange_at"
+            android:textSize="@dimen/card_text_size_bottom"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etAmount"
             />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -45,10 +90,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnExchange"
+            app:layout_constraintTop_toBottomOf="@+id/tvAt"
             tools:itemCount="1"
             tools:listitem="@layout/item_exchange"
             />
